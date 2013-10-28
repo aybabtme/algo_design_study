@@ -12,8 +12,35 @@ import (
 	"time"
 )
 
+func SelectPivot(arr []int, low, high int) int {
+	width := high - low
+	if width < 3 {
+		return low
+	}
+
+	mid := width / 2
+
+	if arr[low] < arr[mid] {
+		if arr[low] >= arr[high] {
+			return low
+		} else if arr[mid] < arr[high] {
+			return mid
+		}
+	}
+	if arr[low] < arr[high] {
+		return low
+	}
+	if arr[mid] >= arr[high] {
+		return mid
+	}
+	return high
+}
+
 func Partition(arr []int, low, high int) int {
-	pivotVal := arr[low]
+	pivotIdx := SelectPivot(arr, low, high)
+	pivotVal := arr[pivotIdx]
+
+	arr[low], arr[pivotIdx] = arr[pivotIdx], arr[low]
 
 	l := low
 	r := high
@@ -45,12 +72,8 @@ func Partition(arr []int, low, high int) int {
 
 func QuickSort(arr []int, leafSize int) {
 
-	depth := 0
-
 	var recurse func(int, int)
 	recurse = func(low, high int) {
-		depth++
-		defer func() { depth-- }()
 		if high <= low {
 			return
 		}
@@ -109,10 +132,12 @@ func main() {
 				Y: dT.Seconds(),
 			}
 
+			fmt.Print(".")
+
 			xy = append(xy, val)
 
 			if !IsSorted(arr) {
-				fmt.Printf("NOT SORTED\n")
+				fmt.Printf("NOT SORTED, n=%d, arr=%v\n", n, arr)
 			}
 		}
 	}
@@ -142,7 +167,7 @@ func main() {
 func GenerateArray(n int) []int {
 	arr := make([]int, n)
 	for i := 0; i < n; i++ {
-		arr[i] = rand.Int()
+		arr[i] = rand.Intn(n)
 	}
 	return arr
 }
